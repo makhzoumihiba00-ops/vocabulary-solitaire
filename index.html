@@ -1,1 +1,94 @@
-gg
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="description" content="Vocabulary Solitaire — sort 60 English words into 6 categories, classic solitaire style.">
+<title>Vocabulary Solitaire</title>
+<link rel="icon" href="assets/favicon.svg" type="image/svg+xml">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+<div id="app">
+
+  <header id="toolbar">
+    <div class="tb-brand">
+      <span class="suits" aria-hidden="true">♠<i>♥</i><i>♦</i><i>♣</i></span>
+      <h1>Vocabulary&nbsp;Solitaire</h1>
+    </div>
+
+    <nav class="tb-buttons" aria-label="Game controls">
+      <button id="btnNew" class="btn" title="New Game — reshuffle the deck" type="button">
+        <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 8v8M8 12h8"/></svg><span>New</span>
+      </button>
+      <button id="btnRestart" class="btn" title="Restart — same deck order" type="button">
+        <svg viewBox="0 0 24 24"><polyline points="1.5 4 1.5 10 7.5 10"/><path d="M3.8 15a9 9 0 1 0 2-9.4L1.5 10"/></svg><span>Restart</span>
+      </button>
+      <button id="btnUndo" class="btn" title="Undo last placement" type="button">
+        <svg viewBox="0 0 24 24"><polyline points="9 14 4 9 9 4"/><path d="M20 20v-7a4 4 0 0 0-4-4H4"/></svg><span>Undo</span>
+      </button>
+      <button id="btnHint" class="btn" title="Show the correct category" type="button">
+        <svg viewBox="0 0 24 24"><path d="M9 18h6M10 21.5h4"/><path d="M12 2.5a7 7 0 0 0-4.9 12c.9.9 1.4 1.6 1.4 2.5v1h7v-1c0-.9.5-1.6 1.4-2.5A7 7 0 0 0 12 2.5z"/></svg><span>Hint</span>
+      </button>
+      <button id="btnSound" class="btn" title="Sound on / off" type="button">
+        <svg viewBox="0 0 24 24"><path class="spk" d="M11 5 6 9H2v6h4l5 4z"/><path class="wave" d="M15.5 8.5a5 5 0 0 1 0 7"/><path class="wave" d="M18.5 5.5a9.5 9.5 0 0 1 0 13"/><path class="mutex" d="M16 9.5l5.5 5.5M21.5 9.5 16 15"/></svg><span>Sound</span>
+      </button>
+      <button id="btnPause" class="btn" title="Pause / resume" type="button">
+        <svg viewBox="0 0 24 24"><g class="pp"><path d="M9 5v14M15 5v14"/></g><path class="pp2" d="M8 5l11 7-11 7z"/></svg><span>Pause</span>
+      </button>
+      <button id="btnFull" class="btn" title="Fullscreen" type="button">
+        <svg viewBox="0 0 24 24"><g class="fe"><path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"/></g><g class="fx"><path d="M4.5 4.5l15 15M19.5 4.5l-15 15"/></g></svg><span>Full</span>
+      </button>
+    </nav>
+
+    <div class="tb-stats">
+      <span class="stat combo" id="hudComboWrap" hidden>Combo <b id="hudCombo">×2</b></span>
+      <span class="stat">Score <b id="hudScore">0</b></span>
+      <span class="stat" id="statTimeWrap">Time <b id="hudTime">00:00</b></span>
+      <span class="stat">Words <b id="hudProgress">0/60</b></span>
+    </div>
+  </header>
+
+  <main id="board">
+    <div id="coach">Drag each word onto its category pile — or tap the word, then tap a category.</div>
+  </main>
+</div>
+
+<!-- Pause overlay -->
+<div id="pauseOverlay" class="overlay" role="dialog" aria-label="Game paused">
+  <div class="panel">
+    <h2>Paused</h2>
+    <p class="sub">The timer is stopped. Take your time!</p>
+    <div class="panel-actions">
+      <button id="btnResume" class="btn primary" type="button">Resume</button>
+      <button id="btnPauseNew" class="btn" type="button">New Game</button>
+    </div>
+  </div>
+</div>
+
+<!-- Victory overlay -->
+<div id="winOverlay" class="overlay" role="dialog" aria-label="Game finished">
+  <div id="confetti"></div>
+  <div class="panel win-panel">
+    <svg class="trophy" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 3h12v2h3v3a5 5 0 0 1-5 5h-.4A6 6 0 0 1 13 15.7V18h3.5a1 1 0 0 1 1 1v2h-11v-2a1 1 0 0 1 1-1H11v-2.3A6 6 0 0 1 8.4 13H8a5 5 0 0 1-5-5V5h3V3zm-1 4v1a3 3 0 0 0 3 3V7H5zm14 0h-3v4a3 3 0 0 0 3-3V7z"/></svg>
+    <h2>Victory!</h2>
+    <p class="sub">All 60 words sorted into their categories.</p>
+    <div class="stars" id="winStars"></div>
+    <div class="win-grid">
+      <div><span>Score</span><b id="winScore">0</b></div>
+      <div><span>Accuracy</span><b id="winAcc">0%</b></div>
+      <div><span>Time</span><b id="winTime">00:00</b></div>
+      <div><span>Best</span><b id="winBest">0</b></div>
+    </div>
+    <p id="winNewBest" class="newbest" hidden>★ New best score! ★</p>
+    <div class="panel-actions">
+      <button id="btnAgain" class="btn primary" type="button">Play Again</button>
+    </div>
+  </div>
+</div>
+
+<script src="js/cards.js"></script>
+<script src="js/audio.js"></script>
+<script src="js/game.js"></script>
+</body>
+</html>
