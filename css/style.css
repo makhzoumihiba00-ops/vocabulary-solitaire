@@ -271,7 +271,7 @@ body {
 .cat-name {
   position: absolute;
   left: 50%;
-  bottom: 17%;
+  bottom: 31%;
   transform: translateX(-50%);
   font-weight: 800;
   color: var(--cat);
