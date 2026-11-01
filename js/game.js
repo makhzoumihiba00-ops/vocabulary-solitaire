@@ -177,6 +177,7 @@
     el.innerHTML =
       '<div class="card-w"><div class="card-inner"><div class="face front">' +
       '<svg class="cat-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' + CATEGORY_ICONS[cat.id] + "</svg>" +
+      '<div class="category-visual" aria-hidden="true">' + CATEGORY_IMAGES[cat.id] + "</div>" +
       '<div class="cat-name">' + cat.name + "</div>" +
       '<div class="cat-count">0/10</div>' +
       '<div class="badge"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
@@ -188,10 +189,12 @@
     const el = div("card word-card draggable");
     const suit = SUITS[(c.id.length * 3 + c.word.length) % 4];
     const sizeCls = c.word.length >= 10 ? " xlong" : c.word.length >= 8 ? " long" : "";
+    const image = WORD_IMAGES[c.word] || "💡";
     el.innerHTML =
       '<div class="card-w"><div class="card-inner">' +
       '<div class="face back"><div class="back-pattern"></div></div>' +
       '<div class="face front"><span class="pip tl">' + suit + '</span><span class="pip br">' + suit + "</span>" +
+      '<div class="word-visual" aria-hidden="true">' + image + "</div>" +
       '<div class="word' + sizeCls + '">' + c.word + "</div></div>" +
       "</div></div>";
     c.el = el;

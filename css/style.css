@@ -200,9 +200,21 @@ body {
 .face.front { display: block; }
 .word-card .front {
   display: flex;
+  flex-direction: column;
   align-items: center;
   justify-content: center;
+  gap: calc(var(--card-h) * 0.045);
   padding: 7%;
+}
+.word-visual {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: calc(var(--card-h) * 0.42);
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+  font-size: calc(var(--card-w) * 0.55);
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.12));
 }
 .word {
   font-weight: 700;
@@ -215,6 +227,17 @@ body {
 }
 .word.long  { font-size: max(8.5px, calc(var(--card-w) * 0.155)); }
 .word.xlong { font-size: max(8px, calc(var(--card-w) * 0.125)); }
+
+.category-visual {
+  position: absolute;
+  left: 50%;
+  top: 20%;
+  transform: translateX(-50%);
+  font-family: "Segoe UI Emoji", "Apple Color Emoji", "Noto Color Emoji", sans-serif;
+  font-size: calc(var(--card-w) * 0.5);
+  line-height: 1;
+  filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.12));
+}
 
 .pip {
   position: absolute;
@@ -237,18 +260,30 @@ body {
   background: linear-gradient(180deg, color-mix(in srgb, var(--cat) 13%, #fdfdfb) 0%, #fdfdfb 62%);
 }
 .cat-icon {
+  position: absolute;
+  left: 7%;
+  top: 6%;
   width: calc(var(--card-w) * 0.3);
   height: calc(var(--card-w) * 0.3);
   color: var(--cat);
   filter: drop-shadow(0 1px 1px rgba(0, 0, 0, 0.15));
 }
 .cat-name {
+  position: absolute;
+  left: 50%;
+  bottom: 17%;
+  transform: translateX(-50%);
   font-weight: 800;
   color: var(--cat);
   font-size: calc(var(--card-w) * 0.155);
   letter-spacing: 0.03em;
+  white-space: nowrap;
 }
 .cat-count {
+  position: absolute;
+  left: 50%;
+  bottom: 5%;
+  transform: translateX(-50%);
   font-size: calc(var(--card-w) * 0.14);
   font-weight: 700;
   color: #57606b;

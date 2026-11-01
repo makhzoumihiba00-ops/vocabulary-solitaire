@@ -33,6 +33,25 @@ const CATEGORIES = [
   }
 ];
 
+/* Emoji illustrations give every word a quick visual clue on its card. */
+const WORD_IMAGES = {
+  DOG: "🐕", CAT: "🐈", LION: "🦁", ELEPHANT: "🐘", HORSE: "🐎",
+  RABBIT: "🐇", MONKEY: "🐒", TIGER: "🐅", SHEEP: "🐑", GIRAFFE: "🦒",
+  APPLE: "🍎", BREAD: "🍞", CHEESE: "🧀", RICE: "🍚", BANANA: "🍌",
+  CARROT: "🥕", CHICKEN: "🐔", EGG: "🥚", POTATO: "🥔", MILK: "🥛",
+  TEACHER: "👩‍🏫", DOCTOR: "👨‍⚕️", NURSE: "👩‍⚕️", ENGINEER: "👷",
+  CHEF: "👨‍🍳", DRIVER: "🚗", FARMER: "🧑‍🌾", DENTIST: "🦷",
+  PILOT: "🧑‍✈️", WAITER: "🤵",
+  SHIRT: "👕", JACKET: "🧥", DRESS: "👗", TROUSERS: "👖",
+  SKIRT: "👗", SOCKS: "🧦", SHOES: "👟", SWEATER: "🧶",
+  COAT: "🧥", HAT: "🎩",
+  BUS: "🚌", TRAIN: "🚆", BICYCLE: "🚲", MOTORCYCLE: "🏍️",
+  CAR: "🚗", TAXI: "🚕", AIRPLANE: "✈️", BOAT: "⛵",
+  TRUCK: "🚚", SUBWAY: "🚇",
+  SOFA: "🛋️", TABLE: "🪑", CHAIR: "🪑", BED: "🛏️", LAMP: "💡",
+  MIRROR: "🪞", PILLOW: "🛏️", FRIDGE: "🧊", WARDROBE: "🚪", CARPET: "🧶"
+};
+
 /* Small inline symbols (SVG fragments, 24x24 viewBox, fill=currentColor). */
 const CATEGORY_ICONS = {
   animals: '<circle cx="6.8" cy="9.4" r="2.1"/><circle cx="12" cy="7.2" r="2.1"/><circle cx="17.2" cy="9.4" r="2.1"/>' +
@@ -48,6 +67,15 @@ const CATEGORY_ICONS = {
            '<circle cx="8" cy="16.9" r="1.7"/><circle cx="16" cy="16.9" r="1.7"/>' +
            '<path d="M8.9 10.9h2.3v1.9H8.3zM12.8 10.9h2.3l.6 1.9h-2.9z" fill="#fff" opacity=".55"/>',
   home:    '<path d="M12 3.2 2.8 11.3h2.5V20c0 .6.4 1 1 1h3.9v-5.3h3.6V21h3.9c.6 0 1-.4 1-1v-8.7h2.5z"/>'
+};
+
+const CATEGORY_IMAGES = {
+  animals: "🐾",
+  food: "🍽️",
+  jobs: "💼",
+  clothes: "👕",
+  transport: "🚙",
+  home: "🏠"
 };
 
 /* Fisher–Yates shuffle (returns a shuffled copy). */
