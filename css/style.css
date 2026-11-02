@@ -575,13 +575,59 @@ body {
 @media (max-width: 940px) {
   .btn span { display: none; }
   .btn { padding: 9px; }
+  #toolbar {
+    gap: 4px 10px;
+    padding-inline: 8px;
+  }
+  .tb-buttons { flex-wrap: nowrap; }
+  .tb-stats { gap: 8px; }
 }
 @media (max-width: 700px) {
   .tb-brand h1 { display: none; }
   .tb-stats { gap: 8px; font-size: 13px; }
   .stat b { font-size: 14px; }
+  #toolbar { align-content: center; }
+  .tb-brand { flex: 0 0 100%; justify-content: center; height: 16px; }
+  .suits { font-size: 13px; }
+  .btn { min-width: 34px; min-height: 34px; justify-content: center; padding: 8px; }
+  .btn svg { width: 17px; height: 17px; }
+  .level-indicator { height: 26px; min-width: 58px; font-size: 12px; }
+  .deck-overlay { align-items: flex-start; padding: 8px; }
+  .deck-panel { width: 100%; max-height: calc(100dvh - 16px); padding: 18px 14px 14px; border-radius: 14px; }
+  .deck-heading { margin-bottom: 12px; }
+  .deck-heading h2 { font-size: 23px; }
+  .deck-heading p { font-size: 13px; }
+  .deck-card { padding: 14px; }
+  .panel { max-height: calc(100dvh - 16px); overflow-y: auto; padding: 18px 16px; }
+  .panel-actions { flex-wrap: wrap; }
+  .stars svg { width: clamp(38px, 12vw, 52px); height: clamp(38px, 12vw, 52px); }
 }
 @media (max-width: 430px) {
   #statTimeWrap { display: none; }
+  #currentDeckName { display: none; }
   .tb-buttons { gap: 3px; }
+  #toolbar { gap: 3px; padding: 4px 6px; padding-top: calc(4px + env(safe-area-inset-top)); }
+  .tb-brand { height: 14px; }
+  .tb-stats { font-size: 12px; gap: 6px; }
+  .stat b { font-size: 13px; }
+  .btn { min-width: 32px; min-height: 32px; padding: 7px; }
+  .level-indicator { min-width: 56px; height: 24px; padding: 0 7px; font-size: 11px; }
+  .deck-categories { font-size: 12px; }
+  .deck-card h3 { font-size: 16px; }
+  .deck-icon { height: 40px; font-size: 32px; }
+}
+
+@media (orientation: landscape) and (max-height: 500px) {
+  #toolbar { flex-wrap: nowrap; min-height: 44px; }
+  .tb-brand { flex: 0 0 auto; height: auto; }
+  .tb-stats { margin-left: 4px; }
+  #statTimeWrap, #currentDeckName { display: none; }
+  .btn { min-width: 30px; min-height: 30px; padding: 6px; }
+  .level-indicator { height: 24px; }
+  .deck-panel { padding: 14px; }
+  .deck-heading { margin-bottom: 8px; }
+  .deck-heading h2 { font-size: 21px; }
+  .deck-heading p { display: none; }
+  .deck-card { padding: 10px; }
+  .deck-icon { height: 34px; font-size: 28px; }
 }
