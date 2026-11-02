@@ -28,7 +28,6 @@
     btnSound: document.getElementById("btnSound"),
     btnPause: document.getElementById("btnPause"),
     btnFull: document.getElementById("btnFull"),
-    pauseOv: document.getElementById("pauseOverlay"),
     winOv: document.getElementById("winOverlay"),
     confetti: document.getElementById("confetti"),
     winScore: document.getElementById("winScore"),
@@ -493,18 +492,6 @@
   /* ============================================================
    * Pause / resume
    * ============================================================ */
-  function setPaused(p) {
-    if (S.over) p = false;
-    S.paused = p;
-    els.pauseOv.classList.toggle("show", p);
-    els.btnPause.classList.toggle("is-paused", p);
-    els.btnPause.setAttribute("aria-pressed", String(p));
-    if (!p && S.pendingDraw) {
-      S.pendingDraw = false;
-      if (!S.current && !S.over) draw();
-    }
-  }
-
   /* ============================================================
    * Victory
    * ============================================================ */
@@ -559,13 +546,13 @@
    * New game / restart
    * ============================================================ */
   function newGame(fresh) {
-    setPaused(false);
     S.over = false;
     S.busy = false;
     S.pendingDraw = false;
     S.drag = null;
     S.score = 0; S.combo = 0; S.correct = 0; S.wrong = 0; S.elapsed = 0;
     S.started = false; S.selected = false; S.current = null;
+    S.paused = false;
     S.history.length = 0;
     CATS.forEach(c => { S.piles[c.id].length = 0; });
 
@@ -575,6 +562,11 @@
     els.winOv.classList.remove("show");
     els.confetti.innerHTML = "";
     boardEl.classList.remove("won");
+    boardEl.classList.remove("paused");
+    els.btnPause.classList.remove("is-paused");
+    els.btnPause.setAttribute("aria-pressed", "false");
+    els.btnPause.title = "Pause game";
+    els.btnPause.querySelector("span").textContent = "Pause";
 
     boardEl.classList.add("no-anim");
     allCards.forEach(c => {
@@ -601,13 +593,21 @@
    * Toolbar wiring
    * ============================================================ */
   els.btnNew.addEventListener("click", () => { Sound.unlock(); Sound.click(); newGame(true); });
-  document.getElementById("btnPauseNew").addEventListener("click", () => { Sound.click(); newGame(true); });
-  document.getElementById("btnResume").addEventListener("click", () => { Sound.click(); setPaused(false); });
   document.getElementById("btnAgain").addEventListener("click", () => { Sound.click(); newGame(true); });
   els.btnRestart.addEventListener("click", () => { Sound.unlock(); Sound.click(); newGame(false); });
   els.btnUndo.addEventListener("click", () => { Sound.unlock(); undo(); });
   els.btnHint.addEventListener("click", () => { Sound.unlock(); hint(); });
-  els.btnPause.addEventListener("click", () => { Sound.unlock(); Sound.click(); setPaused(!S.paused); });
+
+  els.btnPause.addEventListener("click", () => {
+    Sound.unlock(); Sound.click();
+    S.paused = !S.paused;
+    els.btnPause.classList.toggle("is-paused", S.paused);
+    els.btnPause.setAttribute("aria-pressed", String(S.paused));
+    els.btnPause.title = S.paused ? "Resume game" : "Pause game";
+    els.btnPause.querySelector("span").textContent = S.paused ? "Resume" : "Pause";
+    boardEl.classList.toggle("paused", S.paused);
+    if (!S.paused && S.pendingDraw) { S.pendingDraw = false; draw(); }
+  });
 
   els.btnSound.addEventListener("click", () => {
     const m = !Sound.isMuted();
@@ -651,10 +651,6 @@
       setTimeout(relayout, 90);
     })
   );
-  document.addEventListener("visibilitychange", () => {
-    if (document.hidden && S.started && !S.over && !S.paused) setPaused(true);
-  });
-
   /* Debug/testing API (also used by QA). */
   window.VS = {
     state: S, newGame, restart: () => newGame(false), draw, undo, hint, tryPlace, relayout,
