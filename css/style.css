@@ -169,6 +169,7 @@ body {
 }
 .card.draggable { pointer-events: auto; touch-action: none; cursor: grab; }
 .card.dragging { transition: none !important; cursor: grabbing; }
+.word-card { transform: none; }
 
 .card-w {
   width: 100%; height: 100%;

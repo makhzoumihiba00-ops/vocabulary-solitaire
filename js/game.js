@@ -79,14 +79,14 @@
   function layout() {
     const bw = boardEl.clientWidth, bh = boardEl.clientHeight;
     const RATIO = 1.45;    // card height / width
-    const GAP = 0.14;      // moderate gap between cards
-    const OFF = 0.15;      // stack offset / card height (word stays readable)
+    const GAP = 0.28;      // wide, clear spacing between category columns
+    const OFF = 0.12;      // compact stack offset lets cards use more of the page width
     const VG = 0.25;       // vertical gap between deck row and columns / card height
-    const PAD = 12;
+    const PAD = 18;
 
     let w = Math.min(
       (bw - 2 * PAD) / (6 + 5 * GAP),
-      (bh - 2 * PAD) / ((3 + VG + 9 * OFF) * RATIO)
+      (bh - 2 * PAD) / (4.2 * RATIO)
     );
     w = Math.max(w, 34);
 
@@ -136,8 +136,8 @@
     CATS.forEach((c, i) => {
       const el = catCards[c.id].root;
       setPos(el, L.colX(i), L.catY);
-      el.style.width = (L.w * 1.08) + "px";
-      el.style.height = (L.h * 1.08) + "px";
+      el.style.width = L.w + "px";
+      el.style.height = L.h + "px";
       el.style.zIndex = 95;
     });
     S.deck.forEach((id, i) => {
