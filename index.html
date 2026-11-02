@@ -42,10 +42,24 @@
     </nav>
 
     <div class="tb-stats">
+      <span class="stat" id="currentDeckName"></span>
       <span class="stat combo" id="hudComboWrap" hidden>Combo <b id="hudCombo">×2</b></span>
       <span class="stat">Score <b id="hudScore">0</b></span>
       <span class="stat" id="statTimeWrap">Time <b id="hudTime">00:00</b></span>
       <span class="stat">Words <b id="hudProgress">0/60</b></span>
+    </div>
+
+    <!-- Deck selection -->
+    <div id="deckOverlay" class="overlay deck-overlay" role="dialog" aria-modal="true" aria-label="Choose Your Deck">
+      <div class="deck-panel">
+        <button id="btnCloseDecks" class="deck-close" type="button" aria-label="Close deck selection">×</button>
+        <div class="deck-heading">
+          <span>Vocabulary Solitaire</span>
+          <h2>Choose Your Deck</h2>
+          <p>Select a collection and start sorting.</p>
+        </div>
+        <div id="deckChoices" class="deck-choices"></div>
+      </div>
     </div>
   </header>
 
@@ -71,6 +85,7 @@
     <p id="winNewBest" class="newbest" hidden>★ New best score! ★</p>
     <div class="panel-actions">
       <button id="btnAgain" class="btn primary" type="button">Play Again</button>
+      <button id="btnChooseAnother" class="btn" type="button">Choose Another Deck</button>
     </div>
   </div>
 </div>

@@ -9,8 +9,8 @@
 (function () {
 
   /* ---------- constants & elements ---------- */
-  const CATS = CATEGORIES;
-  const CAT_INDEX = Object.fromEntries(CATS.map((c, i) => [c.id, i]));
+  let CATS = CATEGORIES;
+  let CAT_INDEX = Object.fromEntries(CATS.map((c, i) => [c.id, i]));
   const SUITS = ["♠", "♥", "♦", "♣"];
 
   const boardEl = document.getElementById("board");
@@ -28,6 +28,9 @@
     btnSound: document.getElementById("btnSound"),
     btnPause: document.getElementById("btnPause"),
     btnFull: document.getElementById("btnFull"),
+    deckOv: document.getElementById("deckOverlay"),
+    deckChoices: document.getElementById("deckChoices"),
+    currentDeckName: document.getElementById("currentDeckName"),
     winOv: document.getElementById("winOverlay"),
     confetti: document.getElementById("confetti"),
     winScore: document.getElementById("winScore"),
@@ -38,8 +41,8 @@
     winNewBest: document.getElementById("winNewBest")
   };
 
-  const allCards = buildCards();
-  const byId = new Map(allCards.map(c => [c.id, c]));
+  let allCards = buildCards();
+  let byId = new Map(allCards.map(c => [c.id, c]));
   const catCards = {};   // catId -> { root, countEl }
   const zoneEls = [];    // per-category tap zones
   let slotDeck, slotWaste, deckZone;
@@ -133,6 +136,7 @@
 
   function positionAllCards() {
     const L = S.L;
+    if (!L) return;
     CATS.forEach((c, i) => {
       const el = catCards[c.id].root;
       setPos(el, L.colX(i), L.catY);
@@ -142,6 +146,7 @@
     });
     S.deck.forEach((id, i) => {
       const el = cardEl(id);
+      if (!el) return;
       const above = S.deck.length - 1 - i;      // 0 for the top card
       const d = Math.min(above, 3);
       setPos(el, L.deck.x + d * 0.7, L.deck.y + d * 0.9);
@@ -190,8 +195,8 @@
     el.style.setProperty("--cat", cat.color);
     el.innerHTML =
       '<div class="card-w"><div class="card-inner"><div class="face front">' +
-      '<svg class="cat-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' + CATEGORY_ICONS[cat.id] + "</svg>" +
-      '<div class="category-visual" aria-hidden="true">' + CATEGORY_IMAGES[cat.id] + "</div>" +
+      '<svg class="cat-icon" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">' + (CATEGORY_ICONS[cat.id] || '<circle cx="12" cy="12" r="8"/>') + "</svg>" +
+      '<div class="category-visual" aria-hidden="true">' + (CATEGORY_IMAGES[cat.id] || "✨") + "</div>" +
       '<div class="cat-name">' + cat.name + "</div>" +
       '<div class="cat-count">0/10</div>' +
       '<div class="badge"><svg viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" fill="none" stroke="#fff" stroke-width="3.4" stroke-linecap="round" stroke-linejoin="round"/></svg></div>' +
@@ -215,6 +220,9 @@
   }
 
   function buildBoard() {
+    boardEl.querySelectorAll(".slot, .zone, .card").forEach(el => el.remove());
+    zoneEls.length = 0;
+    Object.keys(catCards).forEach(id => delete catCards[id]);
     slotDeck = div("slot");
     slotWaste = div("slot");
     deckZone = div("zone deck-zone");
@@ -564,6 +572,45 @@
   /* ============================================================
    * New game / restart
    * ============================================================ */
+  let activeDeck = DECKS[0];
+
+  function selectDeck(deck) {
+    activeDeck = deck;
+    CATS = deck.categories;
+    CAT_INDEX = Object.fromEntries(CATS.map((c, i) => [c.id, i]));
+    allCards = buildCards(CATS);
+    byId = new Map(allCards.map(c => [c.id, c]));
+    S.current = null;
+    S.deck = [];
+    S.initialDeck = [];
+    S.history.length = 0;
+    Object.keys(S.piles).forEach(id => delete S.piles[id]);
+    CATS.forEach(c => { S.piles[c.id] = []; });
+    els.currentDeckName.textContent = deck.name;
+    els.deckOv.classList.remove("show");
+    els.winOv.classList.remove("show");
+    buildBoard();
+    newGame(true);
+  }
+
+  function renderDeckChoices() {
+    els.deckChoices.innerHTML = DECKS.map(deck =>
+      '<article class="deck-card">' +
+        '<div class="deck-icon" aria-hidden="true">' + deck.icon + '</div>' +
+        '<h3>' + deck.name + '</h3>' +
+        '<ul class="deck-categories">' + deck.categories.map(c => '<li>' + c.name + '</li>').join("") + '</ul>' +
+        '<div class="deck-total">60 vocabulary words</div>' +
+        '<button class="btn play-deck" type="button" data-deck="' + deck.id + '">Play</button>' +
+      '</article>'
+    ).join("");
+  }
+
+  function openDecks() {
+    renderDeckChoices();
+    els.winOv.classList.remove("show");
+    els.deckOv.classList.add("show");
+  }
+
   function newGame(fresh) {
     S.over = false;
     S.busy = false;
@@ -598,6 +645,11 @@
     layout();
     positionChrome();
     positionAllCards();
+    allCards.forEach(c => {
+      if (!c.el.style.left && !c.el.style.top) {
+        setPos(c.el, S.L.deck.x, S.L.deck.y);
+      }
+    });
     void boardEl.offsetWidth;
     requestAnimationFrame(() => boardEl.classList.remove("no-anim"));
 
@@ -612,7 +664,19 @@
   /* ============================================================
    * Toolbar wiring
    * ============================================================ */
-  els.btnNew.addEventListener("click", () => { Sound.unlock(); Sound.click(); newGame(true); });
+  els.btnNew.addEventListener("click", () => {
+    Sound.unlock(); Sound.click();
+    const started = S.started && !S.over && (S.correct + S.wrong > 0 || S.history.length > 0);
+    if (started && !window.confirm("Discard this unfinished game and choose another deck?")) return;
+    openDecks();
+  });
+  els.deckChoices.addEventListener("click", e => {
+    const button = e.target.closest("[data-deck]");
+    if (!button) return;
+    selectDeck(DECKS.find(d => d.id === button.dataset.deck) || activeDeck);
+  });
+  document.getElementById("btnCloseDecks").addEventListener("click", () => els.deckOv.classList.remove("show"));
+  document.getElementById("btnChooseAnother").addEventListener("click", openDecks);
   document.getElementById("btnAgain").addEventListener("click", () => { Sound.click(); newGame(true); });
   els.btnRestart.addEventListener("click", () => { Sound.unlock(); Sound.click(); newGame(false); });
   els.btnUndo.addEventListener("click", () => { Sound.unlock(); undo(); });
@@ -698,6 +762,7 @@
   buildBoard();
   syncSoundButton();
   relayout();
+  els.currentDeckName.textContent = activeDeck.name;
   newGame(true);
 
 })();

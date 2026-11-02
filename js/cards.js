@@ -78,6 +78,55 @@ const CATEGORY_IMAGES = {
   home: "🏠"
 };
 
+Object.assign(WORD_IMAGES, {
+  HEAD:"🗣️", HAND:"✋", HEART:"❤️", EYE:"👁️", EAR:"👂", NOSE:"👃", FOOT:"🦶", LEG:"🦵", ARM:"💪", MOUTH:"👄",
+  RIVER:"🏞️", FOREST:"🌲", MOUNTAIN:"⛰️", FLOWER:"🌸", TREE:"🌳", ROCK:"🪨", OCEAN:"🌊", LEAF:"🍃", GRASS:"🌱", CLOUD:"☁️",
+  BOOK:"📖", PENCIL:"✏️", DESK:"🪑", CLASS:"🏫", PAPER:"📄", RULER:"📏", BAG:"🎒", LESSON:"📝", LIBRARY:"📚",
+  FOOTBALL:"⚽", TENNIS:"🎾", SWIMMING:"🏊", RUNNING:"🏃", CYCLING:"🚴", BASKETBALL:"🏀", CRICKET:"🏏", GOLF:"⛳", BOXING:"🥊", VOLLEYBALL:"🏐",
+  SUN:"☀️", RAIN:"🌧️", SNOW:"❄️", WIND:"💨", STORM:"⛈️", CLOUDY:"☁️", FOG:"🌫️", THUNDER:"⚡", FROST:"🥶", RAINBOW:"🌈",
+  HAPPY:"😊", SAD:"😢", ANGRY:"😠", CALM:"😌", EXCITED:"🤩", SURPRISED:"😮", PROUD:"😎", SCARED:"😨", LONELY:"😔", KIND:"🤝",
+  COMPUTER:"💻", PHONE:"📱", ROBOT:"🤖", INTERNET:"🌐", KEYBOARD:"⌨️", SCREEN:"🖥️", BATTERY:"🔋", CAMERA:"📷", LAPTOP:"💻", TABLET:"📱",
+  PASSPORT:"🛂", AIRPORT:"🛫", TICKET:"🎟️", HOTEL:"🏨", SUITCASE:"🧳", MAP:"🗺️", TOURIST:"🧭", STATION:"🚉", BEACH:"🏖️", JOURNEY:"🧭",
+  MEDICINE:"💊", HOSPITAL:"🏥", EXERCISE:"🏋️", VITAMIN:"💊", STOMACH:"🫃", SURGERY:"🩺", BANDAGE:"🩹", HEALTHY:"💚", CLINIC:"🏥",
+  GUITAR:"🎸", PIANO:"🎹", VIOLIN:"🎻", DRUMS:"🥁", SINGER:"🎤", SONG:"🎵", CONCERT:"🎤", TRUMPET:"🎺", FLUTE:"🪈", RHYTHM:"🎶",
+  PAINTING:"🎨", GARDENING:"🌻", READING:"📖", COOKING:"🍳", CHESS:"♟️", FISHING:"🎣", DANCING:"💃", WRITING:"✍️", KNITTING:"🧶", HIKING:"🥾",
+  MUSEUM:"🏛️", VILLAGE:"🏘️", CITY:"🌆", CASTLE:"🏰", ISLAND:"🏝️", MARKET:"🏪", BRIDGE:"🌉", HARBOR:"⚓", PARK:"🌳"
+});
+
+Object.assign(CATEGORY_IMAGES, {
+  body: "🫀", nature: "🌿", school: "🏫", sports: "🏅", weather: "🌦️", emotions: "😊",
+  technology: "💻", travel: "🧳", health: "🩺", music: "🎵", hobbies: "🎨", places: "🏛️"
+});
+
+const DECKS = [
+  {
+    id: "everyday", name: "Everyday Vocabulary", icon: "🃏",
+    categories: CATEGORIES
+  },
+  {
+    id: "explore", name: "Explore & Learn", icon: "🌍",
+    categories: [
+      { id: "body", name: "Body", color: "#e56b6f", words: ["Head", "Hand", "Heart", "Eye", "Ear", "Nose", "Foot", "Leg", "Arm", "Mouth"] },
+      { id: "nature", name: "Nature", color: "#4b9f6a", words: ["River", "Forest", "Mountain", "Flower", "Tree", "Rock", "Ocean", "Leaf", "Grass", "Cloud"] },
+      { id: "school", name: "School", color: "#3974c6", words: ["Book", "Pencil", "Teacher", "Desk", "Class", "Paper", "Ruler", "Bag", "Lesson", "Library"] },
+      { id: "sports", name: "Sports", color: "#ef8b32", words: ["Football", "Tennis", "Swimming", "Running", "Cycling", "Basketball", "Cricket", "Golf", "Boxing", "Volleyball"] },
+      { id: "weather", name: "Weather", color: "#6aaed6", words: ["Sun", "Rain", "Snow", "Wind", "Storm", "Cloudy", "Fog", "Thunder", "Frost", "Rainbow"] },
+      { id: "emotions", name: "Emotions", color: "#b85fc5", words: ["Happy", "Sad", "Angry", "Calm", "Excited", "Surprised", "Proud", "Scared", "Lonely", "Kind"] }
+    ]
+  },
+  {
+    id: "challenge", name: "Challenge Vocabulary", icon: "🏆",
+    categories: [
+      { id: "technology", name: "Technology", color: "#4d70c9", words: ["Computer", "Phone", "Robot", "Internet", "Keyboard", "Screen", "Battery", "Camera", "Laptop", "Tablet"] },
+      { id: "travel", name: "Travel", color: "#d66b44", words: ["Passport", "Airport", "Ticket", "Hotel", "Suitcase", "Map", "Tourist", "Station", "Beach", "Journey"] },
+      { id: "health", name: "Health", color: "#d64e61", words: ["Medicine", "Hospital", "Exercise", "Vitamin", "Doctor", "Stomach", "Surgery", "Bandage", "Healthy", "Clinic"] },
+      { id: "music", name: "Music", color: "#9a62c7", words: ["Guitar", "Piano", "Violin", "Drums", "Singer", "Song", "Concert", "Trumpet", "Flute", "Rhythm"] },
+      { id: "hobbies", name: "Hobbies", color: "#43a47a", words: ["Painting", "Gardening", "Reading", "Cooking", "Chess", "Fishing", "Dancing", "Writing", "Knitting", "Hiking"] },
+      { id: "places", name: "Places", color: "#b08a3c", words: ["Library", "Museum", "Village", "City", "Castle", "Island", "Market", "Bridge", "Harbor", "Park"] }
+    ]
+  }
+];
+
 /* Fisher–Yates shuffle (returns a shuffled copy). */
 function fisherYatesShuffle(arr) {
   for (let i = arr.length - 1; i > 0; i--) {
@@ -89,9 +138,9 @@ function fisherYatesShuffle(arr) {
 function shuffled(arr) { return fisherYatesShuffle(arr.slice()); }
 
 /* Build the flat list of vocabulary card objects: {id, word, cat, el}. */
-function buildCards() {
+function buildCards(categories = CATEGORIES) {
   const out = [];
-  for (const cat of CATEGORIES) {
+  for (const cat of categories) {
     cat.words.forEach((w, i) => out.push({
       id: cat.id + "-" + i,
       word: w.toUpperCase(),
