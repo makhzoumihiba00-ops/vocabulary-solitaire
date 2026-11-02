@@ -7,6 +7,7 @@
  * ============================================================ */
 
 * { margin: 0; padding: 0; box-sizing: border-box; }
+[hidden] { display: none !important; }
 
 html, body { height: 100%; }
 
@@ -93,6 +94,23 @@ body {
 }
 .stat b { color: #fff; font-size: 15px; margin-left: 3px; }
 .stat.combo b { color: #ffd76e; }
+.level-indicator {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 64px;
+  height: 28px;
+  padding: 0 9px;
+  border: 1px solid rgba(255, 255, 255, 0.28);
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.14);
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
+  box-shadow: inset 0 1px rgba(255, 255, 255, 0.12);
+}
 
 /* ---------------- Board (green felt) ---------------- */
 

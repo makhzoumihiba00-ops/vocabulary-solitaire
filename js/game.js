@@ -31,6 +31,7 @@
     deckOv: document.getElementById("deckOverlay"),
     deckChoices: document.getElementById("deckChoices"),
     currentDeckName: document.getElementById("currentDeckName"),
+    levelIndicator: document.getElementById("levelIndicator"),
     winOv: document.getElementById("winOverlay"),
     confetti: document.getElementById("confetti"),
     winScore: document.getElementById("winScore"),
@@ -38,7 +39,9 @@
     winTime: document.getElementById("winTime"),
     winBest: document.getElementById("winBest"),
     winStars: document.getElementById("winStars"),
-    winNewBest: document.getElementById("winNewBest")
+    winNewBest: document.getElementById("winNewBest"),
+    winMessage: document.getElementById("winMessage"),
+    btnNextLevel: document.getElementById("btnNextLevel")
   };
 
   let allCards = buildCards();
@@ -208,7 +211,7 @@
     const el = div("card word-card draggable");
     const suit = SUITS[(c.id.length * 3 + c.word.length) % 4];
     const sizeCls = c.word.length >= 10 ? " xlong" : c.word.length >= 8 ? " long" : "";
-    const image = WORD_IMAGES[c.word] || "💡";
+    const image = getWordImage(c.word, c.cat);
     el.innerHTML =
       '<div class="card-w"><div class="card-inner">' +
       '<div class="face back"><div class="back-pattern"></div></div>' +
@@ -553,6 +556,19 @@
 
     spawnConfetti();
     updateHUD();
+    if (activeLevel < 5) {
+      els.winMessage.textContent = "Level " + activeLevel + " complete! All 60 words sorted.";
+      els.btnNextLevel.textContent = "Next Level";
+      els.btnNextLevel.hidden = false;
+      saveDeckLevel(activeDeck.id, activeLevel + 1);
+      activeLevel++;
+      updateLevelIndicator();
+    } else {
+      els.winMessage.textContent = "Deck Completed! You mastered all 5 levels.";
+      els.btnNextLevel.textContent = "Replay Level 5";
+      els.btnNextLevel.hidden = false;
+      saveDeckLevel(activeDeck.id, 5);
+    }
     setTimeout(() => els.winOv.classList.add("show"), 1100);
   }
 
@@ -573,10 +589,50 @@
    * New game / restart
    * ============================================================ */
   let activeDeck = DECKS[0];
+  let activeLevel = 1;
+
+  function levelStorageKey(deckId) {
+    return "level." + deckId;
+  }
+
+  function loadDeckLevel(deckId) {
+    const stored = parseInt(store.get(levelStorageKey(deckId), "1"), 10);
+    if (Number.isFinite(stored) && stored !== 1) return Math.min(5, Math.max(1, stored));
+    try {
+      const legacy = parseInt(localStorage.getItem("vocabSolitaire.level." + deckId), 10);
+      if (Number.isFinite(legacy)) return Math.min(5, Math.max(1, legacy));
+    } catch (e) {}
+    return Number.isFinite(stored) ? Math.min(5, Math.max(1, stored)) : 1;
+  }
+
+  function saveDeckLevel(deckId, level) {
+    store.set(levelStorageKey(deckId), String(level));
+  }
+
+  function updateLevelIndicator() {
+    els.levelIndicator.textContent = "Level " + activeLevel;
+    els.levelIndicator.setAttribute("aria-label", "Current level " + activeLevel);
+  }
+
+  function activateCurrentLevel() {
+    CATS = categoriesForLevel(activeDeck, activeLevel);
+    CAT_INDEX = Object.fromEntries(CATS.map((c, i) => [c.id, i]));
+    allCards = buildCards(CATS);
+    byId = new Map(allCards.map(c => [c.id, c]));
+    S.current = null;
+    S.deck = [];
+    S.initialDeck = [];
+    S.history.length = 0;
+    Object.keys(S.piles).forEach(id => delete S.piles[id]);
+    CATS.forEach(c => { S.piles[c.id] = []; });
+    buildBoard();
+  }
 
   function selectDeck(deck) {
     activeDeck = deck;
-    CATS = deck.categories;
+    activeLevel = loadDeckLevel(deck.id);
+    updateLevelIndicator();
+    CATS = categoriesForLevel(deck, activeLevel);
     CAT_INDEX = Object.fromEntries(CATS.map((c, i) => [c.id, i]));
     allCards = buildCards(CATS);
     byId = new Map(allCards.map(c => [c.id, c]));
@@ -589,7 +645,7 @@
     els.currentDeckName.textContent = deck.name;
     els.deckOv.classList.remove("show");
     els.winOv.classList.remove("show");
-    buildBoard();
+    activateCurrentLevel();
     newGame(true);
   }
 
@@ -622,7 +678,10 @@
     S.history.length = 0;
     CATS.forEach(c => { S.piles[c.id].length = 0; });
 
-    if (fresh || !S.initialDeck.length) S.initialDeck = shuffled(allCards.map(c => c.id));
+    if (fresh || !S.initialDeck.length) {
+      S.initialDeck = allCards.map(c => c.id);
+      for (let i = 0; i < activeLevel; i++) S.initialDeck = shuffled(S.initialDeck);
+    }
     S.deck = S.initialDeck.slice();
 
     els.winOv.classList.remove("show");
@@ -678,6 +737,12 @@
   document.getElementById("btnCloseDecks").addEventListener("click", () => els.deckOv.classList.remove("show"));
   document.getElementById("btnChooseAnother").addEventListener("click", openDecks);
   document.getElementById("btnAgain").addEventListener("click", () => { Sound.click(); newGame(true); });
+  els.btnNextLevel.addEventListener("click", () => {
+    Sound.click();
+    els.winOv.classList.remove("show");
+    activateCurrentLevel();
+    newGame(true);
+  });
   els.btnRestart.addEventListener("click", () => { Sound.unlock(); Sound.click(); newGame(false); });
   els.btnUndo.addEventListener("click", () => { Sound.unlock(); undo(); });
   els.btnHint.addEventListener("click", () => { Sound.unlock(); hint(); });
@@ -759,9 +824,11 @@
   if (!check.ok) console.warn("Vocabulary content issues:", check.issues);
   else console.info("Vocabulary Solitaire: " + check.total + " words in " + check.categories + " categories loaded.");
 
-  buildBoard();
   syncSoundButton();
+  activeLevel = loadDeckLevel(activeDeck.id);
+  activateCurrentLevel();
   relayout();
+  updateLevelIndicator();
   els.currentDeckName.textContent = activeDeck.name;
   newGame(true);
 

@@ -52,6 +52,50 @@ const WORD_IMAGES = {
   MIRROR: "🪞", PILLOW: "🛏️", FRIDGE: "🧊", WARDROBE: "🚪", CARPET: "🧶"
 };
 
+function normalizeWordKey(word) {
+  return String(word || "").toUpperCase().replace(/[^A-Z0-9]/g, "");
+}
+
+const LEVEL_IMAGE_MAPS = {
+  animals: ["🐼","🦊","🐻","🦌","🐺","🦓","🐨","🦘","🦦","🐫","🐷","🐄","🦆","🐐","🫏","🐭","🐧","🦉","🐸","🐍","🦇","🐝","🦋","🦭","🐋","🦈","🦀","🐟","🦜","🐹","🫏","🐆","🦛","🦏","🦙","🦡","🫎","🦝","🐿️","🐊"],
+  food: ["🍊","🍐","🥭","🍓","🌽","🍅","🥒","🧅","🫛","🫘","🍲","🍕","🍝","🍔","🥗","🐟","🥩","🥣","🧈","🍯","🍪","🍰","🍬","🍩","🍯","🥣","🍜","🍚","🥪","🌭","🥦","🍃","🍋","🍇","🍑","🥜","🍉","🍞","🥞","🍣"],
+  jobs: ["🥖","💈","🏗️","🎨","👮","🚒","📚","👩‍⚕️","🔬","⚖️","✍️","🎤","🎭","📷","🔧","🔧","⚡","🪚","🧵","🌱","📋","🏅","💳","📮","🎖️","🎣","🩺","⚖️","🎨","🛡️","🧮","📝","🌐","💻","📰","🎵","💐","👶","🚀","🩺"],
+  clothes: ["👕","👖","🩳","🧣","🧤","👢","🩴","🎽","🛌","👚","🦺","🧥","👔","👖","👗","🧥","🧥","👩‍🍳","🤵","🏊","🧢","🥿","🩱","🦸","🧘","🕶️","👖","🧥","👔","🔘","🎀","🎀","🧦","🏃","👘","🧥","👕","👕","🦺","🌙"],
+  transport: ["🚁","🚐","🛴","🚊","⛴️","🚑","🚒","🚓","🚀","🚚","🚲","🚢","🛳️","🚢","🏎️","🛹","🚠","🚗","🚙","🚜","🚀","🛺","🛹","🛴","🚌","🚌","🛒","🏗️","🚜","🛥️","🛶","🎈","🪂","🚐","🚙","⛸️","🚝","🛺","🚐","🚐"],
+  home: ["🚿","🍳","🪟","🚪","🔥","♨️","🚰","🛁","🚿","🪑","📚","🗄️","🛋️","🛏️","🪟","🕐","🧶","🗄️","🗄️","🥣","🍽️","☕","🏺","🧹","🏖️","🧼","🪞","🚽","🧺","❄️","🪭","🔥","💻","🧺","🗑️","🛏️","🖼️","🪴","🍽️","🚪"],
+  body: ["☝️","🦴","🦵","🤸","🔙","🦢","😊","💇","🧒","🦷","👅","⌚","🦶","👍","👣","🗿","✋","🧠","🦴","🩸","🫁","🫘","🫘","🫃","💅","👄","🦷","👁️","🤨","👁️","🦵","👗","🫁","✋","🦶","🗣️","💪","🦴","🦴","🦴"],
+  nature: ["🏖️","🏞️","⛰️","🏞️","🏜️","🏝️","🏔️","🌊","🌴","🌾","🕳️","🌋","🪸","🏖️","🪨","🐚","🌿","🍀","🌿","🎋","🏞️","🌊","💧","💨","🌞","❄️","🌲","🌴","🎋","🌵","🌅","🌈","⚡","🌍","⭐","🌙","🌱","🌳","🌿","🌸"],
+  school: ["🖊️","📓","🖍️","🧽","✂️","🧴","🎒","🖍️","📖","🧮","🧪","📋","👩‍🏫","🧑‍🎓","🏫","🔒","🔔","📝","🏠","📋","🔬","🏛️","🌍","➗","🎵","🎨","💻","🖨️","🗺️","🌐","🪑","🪑","📋","📁","📎","✏️","🍱","📅","🅰️","🎽"],
+  sports: ["🏸","🏒","⚾","🏉","🤿","🎿","🏄","🤼","🏹","🎳","🏓","🥋","🥋","⛸️","🏂","⛵","🚣","🧗","🤸","🤾","⚾","🥍","🏃","🏅","🏃","🏃","🏃","🧘","🧘","🤺","🥋","🤽","🏐","🏀","⚽","🎾","⛳","🏏","🏁","🚴"],
+  weather: ["🌬️","🧊","🌦️","🌈","☀️","🌡️","🥶","☁️","🌫️","🏜️","💧","💧","🌧️","💨","🌨️","🌨️","⚡","📺","🌤️","🍂","🌱","☀️","🍂","❄️","🌪️","🌀","🌧️","☁️","🚿","🧭","🌡️","🌌","🧊","☀️","💨","🌫️","❄️","🌧️","⛈️","🌦️"],
+  emotions: ["😂","❤️","😨","🤝","🌟","☮️","😭","😳","😔","💚","💚","😤","😮","⏳","🦁","😎","🥱","😊","🤔","😟","😳","😞","😤","😁","😲","😌","😰","😴","👋","🎁","❤️","🙌","😂","💪","😰","🤩","🫂","😱","💛","🤗"],
+  technology: ["🖱️","🖨️","🖥️","🔊","🎧","🎙️","🔌","🔌","📡","🛰️","🌐","💿","⚙️","📧","🔑","📠","🖥️","💾","🧠","📋","🗄️","📱","📱","☁️","🎥","🎙️","🚁","🎮","🥽","🤖","🔌","📶","📶","👆","⌨️","⬇️","⬆️","📱","🧮","💻"],
+  travel: ["📖","🛳️","🎒","🧳","🚆","🚌","🚕","📅","📍","🏖️","🎫","🏨","🧭","🎟️","🛃","🛂","⛴️","🚢","⛺","🏛️","🎁","🧭","✈️","🛂","💱","🧭","🛣️","🛬","🛫","🚉","🚉","⚓","🏔️","🏙️","🚗","📅","🏖️","🧳","📋","✅"],
+  health: ["🏋️","🥗","😴","💧","🩹","💉","📄","🦷","💊","🤒","💚","🩺","✅","💓","👁️","👂","🤧","🤒","🪶","🩹","😖","🛌","🥗","🥚","💎","🚨","🌡️","♿","🩼","🩸","💓","🛡️","💉","👩‍⚕️","🩺","💬","💆","😷","🧴","🚑"],
+  music: ["💿","🎸","🎤","🎧","🎵","🎶","🎼","🥁","⏱️","📝","🎵","📀","🎧","📻","🎶","🎻","🎸","🎻","🎷","🎺","🎹","🎻","🎺","🪕","🪘","🪗","🎼","🎼","🔊","🔊","🔊","🎪","👥","🎤","🎵","📋","🎼","💃","🎷","🎭"],
+  hobbies: ["🗿","📷","✏️","🧵","🏺","🚂","🪵","🧘","⛺","✒️","🗃️","📮","🐦","🥧","🏃","🏊","✈️","📓","🎲","🎮","📔","📝","🔢","🧩","🎩","🦢","📿","🧵","🏺","🌻","🍳","🎭","🎬","🏛️","🔭","📍","🎤","🃏","🪵","✍️"],
+  places: ["🛣️","🏘️","🌍","🏛️","🏘️","🏫","🏥","🍽️","🏨","🛫","🚉","🏪","🏟️","🏖️","⛰️","🦁","🌳","🌲","🏞️","🏞️","⛩️","⛪","🕌","🕍","🏰","🗼","🏛️","🛣️","🛣️","🚇","🏘️","🏢","🚜","🏭","🏢","📚","🥖","☕","🎬","🎭"]
+};
+
+function getWordImage(word, categoryId) {
+  const key = normalizeWordKey(word);
+  if (Object.prototype.hasOwnProperty.call(WORD_IMAGES, key)) return WORD_IMAGES[key];
+
+  const normalizedImages = Object.keys(WORD_IMAGES).find(mappedKey =>
+    normalizeWordKey(mappedKey) === key);
+  if (normalizedImages) return WORD_IMAGES[normalizedImages];
+
+  if (typeof LEVEL_WORDS !== "undefined" && Array.isArray(LEVEL_WORDS[categoryId])) {
+    const levelIndex = LEVEL_WORDS[categoryId].findIndex(levelWord =>
+      normalizeWordKey(levelWord) === key);
+    if (levelIndex >= 0 && LEVEL_IMAGE_MAPS[categoryId] &&
+      LEVEL_IMAGE_MAPS[categoryId][levelIndex]) {
+      return LEVEL_IMAGE_MAPS[categoryId][levelIndex];
+    }
+  }
+  return (typeof CATEGORY_IMAGES !== "undefined" && CATEGORY_IMAGES[categoryId]) || "✨";
+}
+
 /* Small inline symbols (SVG fragments, 24x24 viewBox, fill=currentColor). */
 const CATEGORY_ICONS = {
   animals: '<circle cx="6.8" cy="9.4" r="2.1"/><circle cx="12" cy="7.2" r="2.1"/><circle cx="17.2" cy="9.4" r="2.1"/>' +
@@ -126,6 +170,66 @@ const DECKS = [
     ]
   }
 ];
+
+const LEVEL_WORDS = {
+  animals: ["Panda","Fox","Bear","Deer","Wolf","Zebra","Koala","Kangaroo","Otter","Camel","Pig","Cow","Duck","Goat","Donkey","Mouse","Penguin","Owl","Frog","Snake","Bat","Bee","Butterfly","Seal","Whale","Shark","Crab","Fish","Parrot","Hamster","Donkey","Leopard","Hippo","Rhino","Llama","Badger","Moose","Raccoon","Squirrel","Crocodile"],
+  food: ["Orange","Pear","Mango","Strawberry","Corn","Tomato","Cucumber","Onion","Peas","Beans","Soup","Pizza","Pasta","Burger","Salad","Fish","Steak","Yogurt","Butter","Honey","Cookie","Cake","Candy","Donut","Jam","Cereal","Noodle","Rice","Sandwich","Sausage","Broccoli","Spinach","Lemon","Grape","Peach","Peanut","Watermelon","Toast","Pancake","Sushi"],
+  jobs: ["Baker","Barber","Builder","Artist","Police","Firefighter","Librarian","Nurse","Scientist","Lawyer","Writer","Singer","Actor","Photographer","Mechanic","Plumber","Electrician","Carpenter","Tailor","Gardener","Manager","Coach","Cashier","Postman","Soldier","Fisher","Vet","Judge","Designer","Security","Accountant","Editor","Translator","Developer","Reporter","Musician","Florist","Nanny","Astronaut","Surgeon"],
+  clothes: ["T-shirt","Jeans","Shorts","Scarf","Gloves","Boots","Sandals","Uniform","Pajamas","Blouse","Vest","Raincoat","Tie","Belt","Dress","Cardigan","Hoodie","Apron","Suit","Swimsuit","Cap","Slippers","Leggings","Cape","Robe","Sunglasses","Pocket","Collar","Sleeves","Button","Lace","Ribbon","Sock","Tracksuit","Kimono","Poncho","Socks","Tunic","Waistcoat","Nightgown"],
+  transport: ["Helicopter","Van","Scooter","Tram","Ferry","Ambulance","Fire truck","Police car","Rocket","Truck","Bicycle","Ship","Cruise","Submarine","Kart","Skateboard","Cable car","Limousine","Jeep","Tractor","Spaceship","Buggy","Hoverboard","Segway","Coach","Minibus","Trolley","Crane","Bulldozer","Yacht","Raft","Hot air balloon","Glider","Trailer","Snowmobile","Roller skate","Monorail","Pedicab","Gondola","Caravan"],
+  home: ["Bathroom","Kitchen","Window","Door","Stove","Oven","Sink","Bathtub","Shower","Desk","Shelf","Cupboard","Cushion","Blanket","Curtain","Clock","Rug","Dresser","Cabinet","Bowl","Plate","Cup","Vase","Broom","Towel","Soap","Mirror","Toilet","Washing machine","Freezer","Fan","Heater","Computer","Basket","Bin","Pillowcase","Picture","Plant","Dining room","Hallway"],
+  body: ["Finger","Elbow","Knee","Shoulder","Back","Neck","Cheek","Hair","Forehead","Teeth","Tongue","Wrist","Ankle","Thumb","Toe","Chin","Skin","Brain","Bone","Blood","Lung","Liver","Kidney","Stomach","Nail","Lip","Tooth","Pupil","Eyebrow","Eyelash","Hip","Waist","Chest","Palm","Heel","Throat","Muscle","Ribs","Spine","Tendon"],
+  nature: ["Beach","Valley","Hill","Lake","Desert","Island","Canyon","Waterfall","Jungle","Meadow","Cave","Volcano","Coral","Sand","Stone","Shell","Fern","Moss","Vine","Reed","Pond","Stream","Water","Wind","Sunshine","Snowfall","Pine","Palm","Bamboo","Cactus","Horizon","Rainbow","Lightning","Earth","Star","Moon","Seed","Root","Branch","Petal"],
+  school: ["Pen","Notebook","Crayon","Eraser","Scissors","Glue","Backpack","Marker","Dictionary","Calculator","Chalk","Board","Teacher","Student","Classroom","Locker","Bell","Exam","Homework","Project","Science","History","Geography","Math","Music","Art","Computer","Printer","Map","Globe","Desk","Chair","Whiteboard","Folder","Stapler","Sharpener","Lunch box","Schedule","Grade","Uniform"],
+  sports: ["Badminton","Hockey","Baseball","Rugby","Diving","Skiing","Surfing","Wrestling","Archery","Bowling","Table tennis","Karate","Judo","Skating","Snowboarding","Sailing","Rowing","Climbing","Gymnastics","Handball","Softball","Lacrosse","Pole vault","Shot put","Marathon","Sprint","Relay","Yoga","Pilates","Fencing","Taekwondo","Water polo","Volleyball","Basketball","Soccer","Tennis","Golf","Cricket","Motor racing","Cycling"],
+  weather: ["Breeze","Hail","Drizzle","Rainbow","Sunshine","Heat","Cold","Cloud","Mist","Drought","Humidity","Dew","Downpour","Gale","Blizzard","Sleet","Lightning","Forecast","Climate","Season","Spring","Summer","Autumn","Winter","Tornado","Hurricane","Monsoon","Overcast","Shower","Weather vane","Temperature","Aurora","Freezing","Sunny","Windy","Foggy","Snowy","Rainy","Thunderstorm","Weather"],
+  emotions: ["Joy","Love","Fear","Trust","Hope","Peace","Grief","Shame","Guilt","Envy","Jealousy","Pride","Surprise","Patience","Courage","Confident","Bored","Content","Curious","Worried","Embarrassed","Disappointed","Frustrated","Delighted","Shocked","Relieved","Nervous","Sleepy","Friendly","Generous","Compassion","Respect","Humor","Determination","Anxiety","Excitement","Comfort","Panic","Sympathy","Tenderness"],
+  technology: ["Mouse","Printer","Monitor","Speaker","Headphones","Microphone","Charger","Cable","Router","Satellite","Website","Software","Hardware","Email","Password","Scanner","Server","Memory","Processor","Program","Database","Smartphone","Tablet","Cloud","Video","Podcast","Drone","Console","Virtual reality","Artificial intelligence","USB","Bluetooth","Wi-Fi","Touchscreen","Keyboard","Download","Upload","Social media","Algorithm","Coding"],
+  travel: ["Guidebook","Cruise","Backpack","Luggage","Train","Bus","Taxi","Reservation","Destination","Vacation","Excursion","Hostel","Tour","Ticket","Customs","Visa","Ferry","Voyage","Camping","Museum","Souvenir","Compass","Flight","Passport","Currency","Guide","Route","Arrival","Departure","Terminal","Platform","Port","Mountain trip","City break","Road trip","Weekend","Holiday","Travel bag","Itinerary","Check-in"],
+  health: ["Fitness","Diet","Sleep","Water","First aid","Vaccine","Prescription","Dentist","Pharmacy","Symptoms","Recovery","Wellness","Check-up","Pulse","Vision","Hearing","Allergy","Flu","Feather","Injury","Pain","Rest","Nutrition","Protein","Mineral","Emergency","Thermometer","Wheelchair","Crutches","Blood pressure","Heart rate","Immunity","Vaccine","Nurse","Stethoscope","Consultation","Therapy","Mask","Sanitizer","Ambulance"],
+  music: ["Album","Band","Stage","Microphone","Headphones","Melody","Harmony","Beat","Tempo","Lyrics","Chorus","Record","DJ","Radio","Choir","Orchestra","Bass","Cello","Saxophone","Clarinet","Harpsicord","Harp","Trombone","Banjo","Tambourine","Accordion","Music box","Composer","Sound","Volume","Speaker","Festival","Audience","Backing singer","Music note","Playlist","Concert hall","Dance","Jazz","Opera"],
+  hobbies: ["Sculpting","Photography","Drawing","Sewing","Pottery","Model building","Woodworking","Yoga","Camping","Calligraphy","Collecting","Stamp collecting","Birdwatching","Baking","Running","Swimming","Traveling","Travel journal","Board games","Video games","Scrapbooking","Crossword","Sudoku","Puzzles","Magic","Origami","Beadwork","Embroidery","Ceramics","Gardening","Cooking","Acting","Movie","Museum","Astronomy","Geocaching","Singing","Playing cards","Wood carving","Blogging"],
+  places: ["Street","Town","Country","Capital","Village","School","Hospital","Restaurant","Hotel","Airport","Station","Shop","Stadium","Beach","Mountain","Zoo","Garden","Forest","River","Lake","Temple","Church","Mosque","Synagogue","Palace","Tower","Square","Road","Highway","Tunnel","Neighborhood","Apartment","Farm","Factory","Office","Library","Bakery","Café","Cinema","Theater"]
+};
+
+function categoriesForLevel(deck, level) {
+  if (!deck || !deck.categories) return [];
+  const categories = deck.categories;
+  if (level <= 1) return categories;
+  const baseWords = categories.flatMap(cat => cat.words.map(word => word.toLowerCase()));
+  const previousWords = new Set(baseWords);
+  for (let previousLevel = 2; previousLevel < level; previousLevel++) {
+    const previousCategories = buildLevelCategories(categories, previousLevel, previousWords);
+    previousCategories.forEach(cat => cat.words.forEach(word => previousWords.add(word.toLowerCase())));
+  }
+
+  return buildLevelCategories(categories, level, previousWords);
+}
+
+function buildLevelCategories(categories, level, excludedWords) {
+  return categories.map((cat, categoryIndex) => {
+    const pool = cat.levelWords || LEVEL_WORDS[cat.id] || [];
+    const alternatePool = pool.filter(word =>
+      !excludedWords.has(word.toLowerCase()));
+    const levelOffset = (level - 2) * 10 % Math.max(1, alternatePool.length);
+    const orderedPool = [
+      ...alternatePool.slice(levelOffset, levelOffset + 10),
+      ...alternatePool.slice(0, levelOffset),
+      ...alternatePool.slice(levelOffset + 10)
+    ];
+    const words = [];
+    for (const word of orderedPool) {
+      const key = word.toLowerCase();
+      if (!excludedWords.has(key) && !words.some(existing => existing.toLowerCase() === key)) {
+        words.push(word);
+      }
+      if (words.length === 10) break;
+    }
+    if (words.length !== 10) return cat;
+    return { ...cat, words: words.slice(), levelWords: pool.slice() };
+  });
+}
+
 
 /* Fisher–Yates shuffle (returns a shuffled copy). */
 function fisherYatesShuffle(arr) {
