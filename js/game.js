@@ -80,20 +80,20 @@
     const bw = boardEl.clientWidth, bh = boardEl.clientHeight;
     const RATIO = 1.45;    // card height / width
     const GAP = 0.28;      // wide, clear spacing between category columns
-    const OFF = 0.12;      // compact stack offset lets cards use more of the page width
+    const OFF = 0.12;      // compact stack offset keeps six cards on screen
     const VG = 0.25;       // vertical gap between deck row and columns / card height
     const PAD = 18;
 
     let w = Math.min(
       (bw - 2 * PAD) / (6 + 5 * GAP),
-      (bh - 2 * PAD) / (4.2 * RATIO)
+      (bh - 2 * PAD) / ((3 + VG + 5 * OFF) * RATIO)
     );
     w = Math.max(w, 34);
 
     const h = w * RATIO, gap = w * GAP, off = h * OFF, vg = h * VG;
     const gridW = 6 * w + 5 * gap;
     const padX = Math.max((bw - gridW) / 2, 8);
-    const contentH = h + vg + h + 9 * off + h;
+    const contentH = h + vg + h + 5 * off + h;
     const topY = Math.max(10, (bh - contentH) / 2);
 
     S.L = {
@@ -148,14 +148,28 @@
       el.style.zIndex = 10 + i;
     });
     if (S.current) {
-      setPos(cardEl(S.current), L.waste.x, L.waste.y);
+      const currentEl = cardEl(S.current);
+      currentEl.style.visibility = "visible";
+      setPos(currentEl, L.waste.x, L.waste.y);
       cardEl(S.current).style.zIndex = 600;
     }
     CATS.forEach((c, i) => S.piles[c.id].forEach((id, j) => {
       const el = cardEl(id);
-      setPos(el, L.colX(i), L.catY + L.h + j * L.off);
-      el.style.zIndex = 100 + j;
+      const visualIndex = visualPileIndex(j, S.piles[c.id].length);
+      if (visualIndex < 0) {
+        el.style.visibility = "hidden";
+        return;
+      }
+      el.style.visibility = "visible";
+      setPos(el, L.colX(i), L.catY + L.h + visualIndex * L.off);
+      el.style.zIndex = 100 + visualIndex;
     }));
+  }
+
+  function visualPileIndex(index, total) {
+    if (index < 5) return index;
+    if (total > 5 && index === total - 1) return 5;
+    return -1;
   }
 
   function relayout() {
@@ -265,6 +279,7 @@
     const id = S.deck.pop();
     S.current = id;
     const el = cardEl(id);
+    el.style.visibility = "visible";
 
     el.classList.remove("moving");
     setPos(el, S.L.deck.x, S.L.deck.y);   // currently face-down on the deck
@@ -310,8 +325,10 @@
 
     const el = c.el;
     el.classList.add("moving");
-    setPos(el, L.colX(col), L.catY + L.h + j * L.off);
-    el.style.zIndex = 100 + j;
+    const visualIndex = visualPileIndex(j, pile.length);
+    setPos(el, L.colX(col), L.catY + L.h + visualIndex * L.off);
+    el.style.zIndex = 100 + visualIndex;
+    positionAllCards();
 
     Sound.place();
     setTimeout(() => Sound.correct(), 90);
@@ -387,12 +404,14 @@
     S.correct = h.correct;
 
     const el = cardEl(h.id);
+    el.style.visibility = "visible";
     el.classList.add("moving");          // stays face-up, returns to the waste slot
     setPos(el, S.L.waste.x, S.L.waste.y);
     el.style.zIndex = 600;
 
     updateCat(h.cat);
     updateHUD();
+    positionAllCards();
     Sound.flip();
   }
 
@@ -571,6 +590,7 @@
     boardEl.classList.add("no-anim");
     allCards.forEach(c => {
       const el = c.el;
+      el.style.visibility = "visible";
       el.classList.remove("faceup", "selected", "wrong", "moving");
       el.style.removeProperty("--d");
     });
