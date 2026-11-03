@@ -257,7 +257,10 @@ body {
   font-size: max(9px, calc(var(--card-w) * 0.19));
   letter-spacing: 0.015em;
   line-height: 1.12;
-  word-break: break-word;
+  width: 86%;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: clip;
 }
 .word.long  { font-size: max(8.5px, calc(var(--card-w) * 0.155)); }
 .word.xlong { font-size: max(8px, calc(var(--card-w) * 0.125)); }

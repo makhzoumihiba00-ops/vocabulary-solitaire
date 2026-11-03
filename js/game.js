@@ -25,6 +25,7 @@
     btnRestart: document.getElementById("btnRestart"),
     btnUndo: document.getElementById("btnUndo"),
     btnHint: document.getElementById("btnHint"),
+    btnSkip: document.getElementById("btnSkip"),
     btnSound: document.getElementById("btnSound"),
     btnPause: document.getElementById("btnPause"),
     btnFull: document.getElementById("btnFull"),
@@ -183,11 +184,25 @@
   function relayout() {
     if (!boardEl.clientWidth) return;
     layout();
+    fitVocabularyWords();
     boardEl.classList.add("no-anim");
     positionChrome();
     positionAllCards();
     void boardEl.offsetWidth; // force reflow before re-enabling transitions
     requestAnimationFrame(() => boardEl.classList.remove("no-anim"));
+  }
+
+  function fitVocabularyWords() {
+    boardEl.querySelectorAll(".word").forEach(wordEl => {
+      wordEl.style.fontSize = "";
+      const availableWidth = wordEl.clientWidth;
+      let fontSize = parseFloat(getComputedStyle(wordEl).fontSize);
+
+      while (wordEl.scrollWidth > availableWidth && fontSize > 7) {
+        fontSize -= 0.5;
+        wordEl.style.fontSize = fontSize + "px";
+      }
+    });
   }
 
   /* ============================================================
@@ -252,6 +267,7 @@
     els.comboWrap.hidden = S.combo < 2;
     els.combo.textContent = "×" + S.combo;
     els.btnUndo.disabled = !S.history.length || S.over;
+    els.btnSkip.disabled = !S.current || !S.deck.length || S.busy || S.paused || S.over;
   }
   function updateCat(catId) {
     catCards[catId].countEl.textContent = S.piles[catId].length + "/10";
@@ -284,10 +300,13 @@
     if (S.over) return;
     if (S.paused) { S.pendingDraw = true; return; }
     if (S.current || !S.deck.length) return;
+    drawCard(S.deck.pop());
+  }
+
+  function drawCard(id) {
     S.started = true;
     startTimer();
 
-    const id = S.deck.pop();
     S.current = id;
     const el = cardEl(id);
     el.style.visibility = "visible";
@@ -300,6 +319,25 @@
     setPos(el, S.L.waste.x, S.L.waste.y);
     Sound.flip();
     deckZone.classList.toggle("empty", !S.deck.length);
+    updateHUD();
+  }
+
+  function skipCurrentCard() {
+    if (!S.current || S.busy || S.paused || S.over || !S.deck.length) return;
+
+    clearSelection();
+    const skippedId = S.current;
+    const nextId = S.deck.pop();
+    const insertAt = Math.floor(Math.random() * (S.deck.length + 1));
+    S.deck.splice(insertAt, 0, skippedId);
+    S.current = null;
+
+    const skippedEl = cardEl(skippedId);
+    skippedEl.classList.remove("moving", "faceup", "selected", "dragging");
+    skippedEl.style.visibility = "hidden";
+    deckZone.classList.toggle("empty", !S.deck.length);
+    updateHUD();
+    drawCard(nextId);
   }
 
   /* ============================================================
@@ -746,6 +784,7 @@
   els.btnRestart.addEventListener("click", () => { Sound.unlock(); Sound.click(); newGame(false); });
   els.btnUndo.addEventListener("click", () => { Sound.unlock(); undo(); });
   els.btnHint.addEventListener("click", () => { Sound.unlock(); hint(); });
+  els.btnSkip.addEventListener("click", () => { Sound.unlock(); Sound.click(); skipCurrentCard(); });
 
   els.btnPause.addEventListener("click", () => {
     Sound.unlock(); Sound.click();
