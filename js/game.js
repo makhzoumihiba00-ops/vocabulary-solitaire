@@ -26,7 +26,6 @@
     btnUndo: document.getElementById("btnUndo"),
     btnHint: document.getElementById("btnHint"),
     btnSkip: document.getElementById("btnSkip"),
-    btnSound: document.getElementById("btnSound"),
     btnPause: document.getElementById("btnPause"),
     btnFull: document.getElementById("btnFull"),
     deckOv: document.getElementById("deckOverlay"),
@@ -797,14 +796,6 @@
     if (!S.paused && S.pendingDraw) { S.pendingDraw = false; draw(); }
   });
 
-  els.btnSound.addEventListener("click", () => {
-    const m = !Sound.isMuted();
-    Sound.setMuted(m);
-    if (!m) { Sound.unlock(); Sound.click(); }
-    els.btnSound.classList.toggle("is-muted", m);
-    els.btnSound.setAttribute("aria-pressed", String(m));
-  });
-
   function fsElement() { return document.fullscreenElement || document.webkitFullscreenElement; }
   els.btnFull.addEventListener("click", () => {
     Sound.unlock(); Sound.click();
@@ -817,10 +808,6 @@
       }
     } catch (e) { /* ignore */ }
   });
-
-  function syncSoundButton() {
-    els.btnSound.classList.toggle("is-muted", Sound.isMuted());
-  }
 
   /* ============================================================
    * Global listeners
@@ -863,7 +850,6 @@
   if (!check.ok) console.warn("Vocabulary content issues:", check.issues);
   else console.info("Vocabulary Solitaire: " + check.total + " words in " + check.categories + " categories loaded.");
 
-  syncSoundButton();
   activeLevel = loadDeckLevel(activeDeck.id);
   activateCurrentLevel();
   relayout();

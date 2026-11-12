@@ -38,7 +38,7 @@ body {
   gap: 6px 14px;
   padding: 5px 12px;
   padding-top: calc(5px + env(safe-area-inset-top));
-  background: linear-gradient(#1b6a33, #145327);
+  background: linear-gradient(rgba(27, 106, 51, 0.88), rgba(20, 83, 39, 0.88));
   border-bottom: 1px solid #0c3f1d;
   box-shadow: 0 1px 6px rgba(0, 0, 0, 0.35);
   z-index: 3000;
@@ -75,10 +75,7 @@ body {
   fill: none; stroke: currentColor;
   stroke-width: 2; stroke-linecap: round; stroke-linejoin: round;
 }
-.btn svg .spk { fill: currentColor; stroke: none; }
-.btn svg .mutex, .btn svg .pp2, .btn svg .fx { display: none; }
-#btnSound.is-muted .wave { display: none; }
-#btnSound.is-muted .mutex { display: block; stroke: #ff9aa2; }
+.btn svg .pp2, .btn svg .fx { display: none; }
 #btnPause.is-paused .pp { display: none; }
 #btnPause.is-paused .pp2 { display: block; fill: currentColor; stroke: none; }
 #btnFull.is-full .fe { display: none; }
@@ -121,7 +118,9 @@ body {
   overflow: hidden;
   touch-action: none;
   background:
-    radial-gradient(120% 100% at 50% 0%, #33904e 0%, #237a3e 45%, #175c2f 100%);
+    linear-gradient(rgba(7, 25, 17, 0.2), rgba(7, 25, 17, 0.2)),
+    url("../assets/fantasy-valley.png") center / cover no-repeat,
+    #175c2f;
 }
 #board::after {
   content: "";
